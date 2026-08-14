@@ -6,12 +6,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app.dart';
 import 'core/di/app_providers.dart';
+import 'core/services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
   await initializeDateFormatting('id_ID');
   final prefs = await SharedPreferences.getInstance();
+
+  await NotificationService.instance.initialize();
 
   runApp(
     MultiProvider(

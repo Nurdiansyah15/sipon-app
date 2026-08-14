@@ -17,6 +17,9 @@ dependencies:
   shared_preferences: ^2.5.5
   cached_network_image: ^3.4.1
   intl: ^0.20.2
+  firebase_core: ^4.1.0
+  firebase_messaging: ^16.0.0
+  flutter_local_notifications: ^19.2.1
 
 dev_dependencies:
   flutter_test:
