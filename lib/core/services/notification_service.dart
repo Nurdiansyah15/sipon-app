@@ -101,6 +101,8 @@ class NotificationService {
     try {
       await _configureLocalNotifications();
       await requestPermission();
+      await _messaging.subscribeToTopic('sipon_test');
+      debugPrint('Subscribed to FCM topic: sipon_test');
 
       FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
