@@ -12,6 +12,7 @@ class ApiConstants {
   static const String refreshToken = '/web/auth/refresh-token';
   static const String me = '/web/auth/me';
   static const String logout = '/auth/logout';
+  static const String notificationDevices = '/web/notifications/devices';
 
   static const String articles = '/web/articles';
   static const String santriProfile = '/web/santri/profile';

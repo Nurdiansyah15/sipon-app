@@ -8,6 +8,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../../firebase_options.dart';
 import '../../shared/router/app_router.dart';
+import '../constants/api_constants.dart';
+import '../network/dio_client.dart';
 
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -49,11 +51,7 @@ class NotificationPayload {
     );
   }
 
-  Map<String, dynamic> toJson() => {
-    'title': title,
-    'body': body,
-    'data': data,
-  };
+  Map<String, dynamic> toJson() => {'title': title, 'body': body, 'data': data};
 }
 
 class NotificationService {
@@ -67,10 +65,22 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
   final Set<String> _processedMessages = <String>{};
-  final List<Map<String, dynamic>> _pendingNotifications = <Map<String, dynamic>>[];
+  final List<Map<String, dynamic>> _pendingNotifications =
+      <Map<String, dynamic>>[];
 
   AppRouter? _router;
+  DioClient? _dioClient;
+  String? _registeredToken;
+  bool _authenticated = false;
   bool _initialized = false;
+
+  void setApiClient(DioClient dioClient) {
+    _dioClient = dioClient;
+  }
+
+  void setAuthenticated(bool value) {
+    _authenticated = value;
+  }
 
   void attachRouter(AppRouter router) {
     _router = router;
@@ -111,11 +121,16 @@ class NotificationService {
       });
 
       FirebaseMessaging.onMessageOpenedApp.listen((message) {
-        unawaited(handleNotificationTap(NotificationPayload.fromRemoteMessage(message).data));
+        unawaited(
+          handleNotificationTap(
+            NotificationPayload.fromRemoteMessage(message).data,
+          ),
+        );
       });
 
       _messaging.onTokenRefresh.listen((token) {
         debugPrint('FCM token refreshed: $token');
+        unawaited(registerDevice(token: token));
       });
 
       await handleInitialMessage();
@@ -145,9 +160,7 @@ class NotificationService {
       sound: true,
     );
 
-    debugPrint(
-      'FCM permission status: ${settings.authorizationStatus.name}',
-    );
+    debugPrint('FCM permission status: ${settings.authorizationStatus.name}');
   }
 
   Future<String?> getToken() async {
@@ -162,11 +175,62 @@ class NotificationService {
     }
   }
 
+  Future<void> registerDevice({String? token}) async {
+    final dioClient = _dioClient;
+    final providerToken = token ?? await getToken();
+    if (!_authenticated ||
+        dioClient == null ||
+        providerToken == null ||
+        providerToken.isEmpty) {
+      return;
+    }
+    if (_registeredToken == providerToken) return;
+
+    try {
+      await dioClient.post(
+        ApiConstants.notificationDevices,
+        data: {
+          'platform': defaultTargetPlatform == TargetPlatform.iOS
+              ? 'ios'
+              : 'android',
+          'push_provider': 'fcm',
+          'provider_token': providerToken,
+        },
+      );
+      _registeredToken = providerToken;
+      debugPrint('FCM device registered with backend');
+    } catch (error, stackTrace) {
+      debugPrint('Unable to register FCM device: $error');
+      debugPrintStack(stackTrace: stackTrace);
+    }
+  }
+
+  Future<void> unregisterDevice() async {
+    final dioClient = _dioClient;
+    final providerToken = _registeredToken ?? await getToken();
+    if (dioClient == null || providerToken == null || providerToken.isEmpty) {
+      return;
+    }
+
+    try {
+      await dioClient.dio.delete(
+        ApiConstants.notificationDevices,
+        data: {'provider_token': providerToken},
+      );
+    } catch (error, stackTrace) {
+      debugPrint('Unable to unregister FCM device: $error');
+      debugPrintStack(stackTrace: stackTrace);
+    } finally {
+      _registeredToken = null;
+    }
+  }
+
   Future<void> handleForegroundMessage(RemoteMessage message) async {
     final payload = NotificationPayload.fromRemoteMessage(message);
     debugPrint('Foreground FCM payload: ${payload.toJson()}');
 
-    if (message.messageId != null && !_processedMessages.add(message.messageId!)) {
+    if (message.messageId != null &&
+        !_processedMessages.add(message.messageId!)) {
       return;
     }
 
@@ -239,7 +303,9 @@ class NotificationService {
   }
 
   Future<void> _configureLocalNotifications() async {
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
     const iosSettings = DarwinInitializationSettings();
 
     final settings = InitializationSettings(
@@ -274,7 +340,8 @@ class NotificationService {
 
     await _localNotifications
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(androidChannel);
   }
 
