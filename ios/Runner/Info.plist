@@ -60,6 +60,10 @@
 	<false/>
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>Allow Sipon to send important app notifications.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Sipon membutuhkan kamera untuk mengambil bukti pembayaran.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Sipon membutuhkan akses galeri untuk memilih bukti pembayaran.</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UISupportedInterfaceOrientations</key>
