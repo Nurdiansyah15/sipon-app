@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "84632721299",
-    "project_id": "push-notif-ddfae",
-    "storage_bucket": "push-notif-ddfae.firebasestorage.app"
+    "project_number": "119053554404",
+    "project_id": "sipon-2f5f6",
+    "storage_bucket": "sipon-2f5f6.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:84632721299:android:4e28f327feb1412f2efa66",
+        "mobilesdk_app_id": "1:119053554404:android:6b82c6f413fdb253cf12f1",
         "android_client_info": {
-          "package_name": "com.sipon.sipon_app"
+          "package_name": "com.kgs.sipon"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBglgDvB59zJkgvwOXlRNwTl8UtIM18OkU"
+          "current_key": "AIzaSyCmGh18U6Uj5RNJUUjFIreU_4IRkHzZWfM"
         }
       ],
       "services": {

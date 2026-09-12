@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/constants/prefs_keys.dart';
 import '../../../../core/network/dio_client.dart';
+import '../../../../core/services/notification_service.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../../data/models/user_model.dart';
 import '../../domain/entities/user.dart';
@@ -60,7 +62,9 @@ class AuthStateProvider extends ChangeNotifier {
       (user) {
         _currentUser = user;
         _isAuthenticated = true;
+        NotificationService.instance.setAuthenticated(true);
         _setLoading(false);
+        unawaited(NotificationService.instance.registerDevice());
         return true;
       },
     );
@@ -92,7 +96,9 @@ class AuthStateProvider extends ChangeNotifier {
       (user) {
         _currentUser = user;
         _isAuthenticated = true;
+        NotificationService.instance.setAuthenticated(true);
         _setLoading(false);
+        unawaited(NotificationService.instance.registerDevice());
         return true;
       },
     );
@@ -100,6 +106,7 @@ class AuthStateProvider extends ChangeNotifier {
 
   Future<void> logout({bool serverSessionAlreadyEnded = false}) async {
     _setLoading(true);
+    await NotificationService.instance.unregisterDevice();
     if (!serverSessionAlreadyEnded) {
       await _logoutUseCase?.call(const NoParams());
     } else {
@@ -108,6 +115,7 @@ class AuthStateProvider extends ChangeNotifier {
       await _prefs.remove(PrefsKey.userProfile.value);
     }
     _isAuthenticated = false;
+    NotificationService.instance.setAuthenticated(false);
     _currentUser = null;
     _setLoading(false);
   }
@@ -133,6 +141,11 @@ class AuthStateProvider extends ChangeNotifier {
     _registerUseCase = registerUseCase;
     _logoutUseCase = logoutUseCase;
     _getMeUseCase = getMeUseCase;
+    NotificationService.instance.setApiClient(dioClient);
+    NotificationService.instance.setAuthenticated(_isAuthenticated);
+    if (_isAuthenticated) {
+      unawaited(NotificationService.instance.registerDevice());
+    }
 
     dioClient.onTokenExpired = () {
       if (_isAuthenticated) {

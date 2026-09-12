@@ -50,18 +50,18 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBglgDvB59zJkgvwOXlRNwTl8UtIM18OkU',
-    appId: '1:84632721299:android:4e28f327feb1412f2efa66',
-    messagingSenderId: '84632721299',
-    projectId: 'push-notif-ddfae',
-    storageBucket: 'push-notif-ddfae.firebasestorage.app',
+    apiKey: 'AIzaSyCmGh18U6Uj5RNJUUjFIreU_4IRkHzZWfM',
+    appId: '1:119053554404:android:6b82c6f413fdb253cf12f1',
+    messagingSenderId: '119053554404',
+    projectId: 'sipon-2f5f6',
+    storageBucket: 'sipon-2f5f6.firebasestorage.app',
   );
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAYKlq3T4TPGW381fDkMGjuBKrdAhJemTM',
-    appId: '1:84632721299:ios:97183d22ce2259e82efa66',
-    messagingSenderId: '84632721299',
-    projectId: 'push-notif-ddfae',
-    storageBucket: 'push-notif-ddfae.firebasestorage.app',
+    apiKey: 'AIzaSyCe0BLhMtm_YrMTAOvMPRlvw6yuKTfQ1PU',
+    appId: '1:119053554404:ios:fc2c403bfb14d558cf12f1',
+    messagingSenderId: '119053554404',
+    projectId: 'sipon-2f5f6',
+    storageBucket: 'sipon-2f5f6.firebasestorage.app',
     iosBundleId: 'com.sipon.siponApp',
   );
 }
